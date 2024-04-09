@@ -1,0 +1,23 @@
+{
+  "name": "app",
+  "version": "0.0.1",
+  "description": "A migration service to enrich existing subcases and pieces with the new document numbering functionality of Kaleidos",
+  "main": "app.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "semantic.works",
+    "kaleidos"
+  ],
+  "author": "Sergio Fenoll",
+  "license": "MIT",
+  "dependencies": {
+    "@lblod/mu-auth-sudo": "^0.6.1",
+    "date-fns": "^3.6.0",
+    "lodash.invert": "^4.3.0"
+  }
+}

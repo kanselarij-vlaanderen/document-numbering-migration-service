@@ -69,7 +69,7 @@ app.get('/', async function (req, res) {
     }
     const pieces = [];
     let counterMatched = false;
-    for (const { piece, pieceName } of piecesResults) {
+    for (const { piece, pieceName, documentContainer } of piecesResults) {
       let vrDoc = null;
       try {
         vrDoc = new VRDocumentName(pieceName);
@@ -77,11 +77,11 @@ app.get('/', async function (req, res) {
         console.debug(`Could not parse piece name ${pieceName}. Probably a piece from testing, skipping`);
         continue;
       }
-      pieces.push({ piece, pieceName, vrDoc });
+      pieces.push({ piece, pieceName, vrDoc, documentContainer });
 
       // Validation
       if (isDoc && isMed) {
-        addError({ subcase, counter, vrDoc, message: 'Marked as a NOTA and a MEDEDLING' });
+        addError({ subcase, counter, vrDoc, message: 'Marked as a NOTA and a MEDEDELING' });
       }
 
       if (isDec && isMed) {
@@ -110,7 +110,11 @@ app.get('/', async function (req, res) {
       }
     }
 
-    for (const [index, { vrDoc }] of pieces.sort((a, b) => a.vrDoc.meta.index - b.vrDoc.meta.index).entries()) {
+    const sortedPieces = pieces.sort((a, b) => {
+      return a.vrDoc.meta.index - b.vrDoc.meta.index;
+    });
+
+    for (const [index, { vrDoc }] of sortedPieces.entries()) {
       console.debug('Agenderingsactiviteitnummer:', vrDoc.meta.caseNrRaw, 'Index:', vrDoc.meta.index, vrDoc.name);
       if (pieces.length > 1 && vrDoc.meta.index !== index + 1) {
         addError({ subcase, counter, vrDoc, index: index + 1, indexFromPiece: vrDoc.meta.index, message: `Index in piece name does not match calculated index: ${index + 1}` });
@@ -125,8 +129,8 @@ app.get('/', async function (req, res) {
 
     // Add new data
     await addAgendaSubcaseId(subcase, counter);
-    for (const [index, { piece, pieceName }] of pieces.sort((a, b) => a.vrDoc.meta.index - b.vrDoc.meta.index).entries()) {
-      await addPiecePosition(piece, index + 1);
+    for (const [index, { piece, pieceName, documentContainer }] of sortedPieces.entries()) {
+      await addPiecePosition(documentContainer, index + 1);
       await addPieceOriginalName(piece, pieceName);
     }
   }

@@ -52,9 +52,9 @@ app.get('/', async function (req, res) {
       }
     }
 
-    const isDoc = agendaitemType === CONSTANTS.AGENDA_ITEM_TYPES.NOTA;
     const isMed = agendaitemType === CONSTANTS.AGENDA_ITEM_TYPES.MEDEDELING;
     const isDec = agendaitemType === CONSTANTS.AGENDA_ITEM_TYPES.NOTA && subcaseType === CONSTANTS.SUBCASE_TYPES.BEKRACHTIGING && hasDecreetPiece;
+    const isDoc = !isDec && agendaitemType === CONSTANTS.AGENDA_ITEM_TYPES.NOTA;
 
     console.debug('isDoc:', isDoc);
     console.debug('isMed:', isMed);

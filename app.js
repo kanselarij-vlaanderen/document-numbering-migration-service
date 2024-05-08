@@ -94,7 +94,7 @@ app.get('/', async function (req, res) {
         counterMatched = true;
       }
     }
-    if (counterMatched) {
+    if (counterMatched || process.env.ALLOW_MISMATCHING_DOCUMENT_NAMES) {
       if (meetingType === CONSTANTS.MEETING_TYPES.PVV) {
         isDec
           ? counters.pvv.dec++
@@ -123,7 +123,7 @@ app.get('/', async function (req, res) {
       }
     }
 
-    if (errors.length) {
+    if (errors.length && !process.env.ALLOW_MISMATCHING_DOCUMENT_NAMES) {
       break;
     }
 

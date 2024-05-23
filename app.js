@@ -118,8 +118,6 @@ app.get('/', async function (req, res) {
       console.debug('Agenderingsactiviteitnummer:', vrDoc.meta.caseNrRaw, 'Index:', vrDoc.meta.index, vrDoc.name);
       if (pieces.length > 1 && vrDoc.meta.index !== index + 1) {
         addError({ subcase, counter, vrDoc, index: index + 1, indexFromPiece: vrDoc.meta.index, message: `Index in piece name does not match calculated index: ${index + 1}` });
-      } else if (isDec && vrDoc.meta.index) {
-        addError({ subcase, counter, vrDoc, message: 'Piece is a decreet on a bekrachtiging but still has a position in its name'});
       }
     }
 

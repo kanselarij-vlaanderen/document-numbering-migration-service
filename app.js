@@ -90,6 +90,7 @@ app.get('/', async function (req, res) {
 
       if (vrDoc.caseNr !== counter) {
         console.debug(JSON.stringify({ subcase, counter, vrDoc, message: 'Counter on piece name and calculated counter do not match' }));
+        addError({ subcase, counter, vrDoc, message: 'Counter on piece name and calculated counter do not match' });
       } else {
         counterMatched = true;
       }

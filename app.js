@@ -7,6 +7,16 @@ import { addAgendaSubcaseId } from './lib/add-agenda-subcase-id';
 import { addPiecePosition } from './lib/add-piece-position';
 import { addPieceOriginalName } from './lib/add-piece-original-name';
 
+const SPECIALLEKES = {
+  INGETROKKEN: "http://themis.vlaanderen.be/id/procedurestap/664C58ED079ED7820208A94C",
+  FOUTE_NUMMER: "http://themis.vlaanderen.be/id/procedurestap/66573F4D079ED7820208BE23",
+
+  NUMMER_780: "http://themis.vlaanderen.be/id/procedurestap/66549A46079ED7820208B598",
+  NUMMER_781: "http://themis.vlaanderen.be/id/procedurestap/66549C90079ED7820208B8E0",
+
+  DUBBEL: "http://themis.vlaanderen.be/id/procedurestap/665EBC0D079ED7820208C7EF",
+}
+
 app.get('/', async function (req, res) {
   res.sendStatus(202);
 
@@ -67,6 +77,26 @@ app.get('/', async function (req, res) {
     } else {
       counter = 1 + (isDec ? counters.regular.dec : isDoc ? counters.regular.doc : counters.regular.med);
     }
+
+    if (subcase === SPECIALLEKES.INGETROKKEN) {
+      console.debug('###### DEALING WITH FAULTY SUBCASE (ingetrokken) --- NOT NUMBERING SUBCASE, BUT INCREASING COUNTER');
+      counters.regular.doc++;
+      continue;
+    } else if (subcase === SPECIALLEKES.FOUTE_NUMMER) {
+      console.debug('###### DEALING WITH FAULTY SUBCASE (foute nummer) --- NUMBERING SUBCASE USING HARDCODED NUMBER 765');
+      counter = 765;
+    } else if (subcase === SPECIALLEKES.NUMMER_780) {
+      console.debug('###### DEALING WITH FAULTY SUBCASE (780) --- NUMBERING SUBCASE USING HARDCODED NUMBER 780, NOT CHANGING COUNTER');
+      counter = 780;
+    } else if (subcase === SPECIALLEKES.NUMMER_781) {
+      console.debug('###### DEALING WITH FAULTY SUBCASE (781) --- NUMBERING SUBCASE USING HARDCODED NUMBER 781, UPDATING COUNTER AND SKIPPING THE MISSING 780');
+      counters.regular.doc++;
+      counter = 781;
+    } else if (subcase === SPECIALLEKES.DUBBEL) {
+      console.debug('###### DEALING WITH FAULTY SUBCASE (dubbel gemaakt) --- NUMBERING SUBCASE USING HARDCODED NUMBER 189, NOT CHANGING COUNTER');
+      counter = 189;
+    }
+
     const pieces = [];
     let counterMatched = false;
     for (const { piece, pieceName, documentContainer } of piecesResults) {
@@ -95,7 +125,13 @@ app.get('/', async function (req, res) {
         counterMatched = true;
       }
     }
-    if (counterMatched || process.env.ALLOW_MISMATCHING_DOCUMENT_NAMES) {
+
+    if ((counterMatched || process.env.ALLOW_MISMATCHING_DOCUMENT_NAMES) &&
+      // Don't increase counter for faulty subcase
+      subcase !== SPECIALLEKES.FOUTE_NUMMER &&
+      subcase !== SPECIALLEKES.NUMMER_780 &&
+      subcase !== SPECIALLEKES.DUBBEL
+    ) {
       if (meetingType === CONSTANTS.MEETING_TYPES.PVV) {
         isDec
           ? counters.pvv.dec++
